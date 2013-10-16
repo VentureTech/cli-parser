@@ -56,7 +56,7 @@ public class Args {
         arguments.addAll(Arrays.asList(args));
         Class<?> clazz;
         if (target instanceof Class) {
-            clazz = (Class) target;
+            clazz = (Class<?>) target;
         } else {
             clazz = target.getClass();
             try {
@@ -118,7 +118,7 @@ public class Args {
         }
     }
 
-    private static void addArgument(Class type, Field field, Object target, Object value, String delimiter) {
+    private static void addArgument(Class<?> type, Field field, Object target, Object value, String delimiter) {
         try {
             Object[] os = (Object[]) field.get(target);
             Object[] vs = (Object[]) getValue(type, value, delimiter);
@@ -133,7 +133,7 @@ public class Args {
         }
     }
 
-    private static void addPropertyArgument(Class type, PropertyDescriptor property, Object target, Object value, String delimiter) {
+    private static void addPropertyArgument(Class<?> type, PropertyDescriptor property, Object target, Object value, String delimiter) {
         try {
             Method readMethod = property.getReadMethod();
             makeAccessible(readMethod);
@@ -150,7 +150,7 @@ public class Args {
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("Could not find constructor in class " + type.getName() + " that takes a string", e);
         } catch (InvocationTargetException e) {
-            throw new IllegalArgumentException("Failed to validate argument " + value + " for " + property);
+            throw new IllegalArgumentException("Failed to validate argument " + value + " for " + property, e);
         }
     }
 
@@ -209,7 +209,7 @@ public class Args {
     public static void usage(PrintStream errStream, Object target) {
         Class<?> clazz;
         if (target instanceof Class) {
-            clazz = (Class) target;
+            clazz = (Class<?>) target;
         } else {
             clazz = target.getClass();
         }
@@ -367,7 +367,7 @@ public class Args {
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("Could not find constructor in class " + type.getName() + " that takes a string", e);
         } catch (InvocationTargetException e) {
-            throw new IllegalArgumentException("Failed to validate argument " + value + " for " + property);
+            throw new IllegalArgumentException("Failed to validate argument " + value + " for " + property, e);
         }
     }
 
@@ -466,11 +466,12 @@ public class Args {
                 if (compatibleType.isAssignableFrom(type)) {
                     try {
                         Method m = type.getMethod(methodName, String.class);
+                        makeAccessible(m);
                         return m.invoke(null, value);
                     } catch (NoSuchMethodException e) {
                         // ignore
                     } catch (Exception e) {
-                        throw new IllegalArgumentException(String.format("could not invoke %s#%s to create an obejct from %s", type.toString(), methodName, value));
+                        throw new IllegalArgumentException(String.format("could not invoke %s#%s to create an obejct from %s", type.toString(), methodName, value), e);
                     }
                 }
                 return v;
