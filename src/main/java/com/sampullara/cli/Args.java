@@ -479,6 +479,26 @@ public class Args {
         public Object createValue(Class<?> type, String value) {
             Object v = null;
             try {
+                if (type.isPrimitive())
+                {
+                    // Autobox primitives
+                    if (type == Boolean.TYPE)
+                        type = Boolean.class;
+//                    else if (type == Character.TYPE)
+//                        type = Character.class;
+                    else if (type == Byte.TYPE)
+                        type = Byte.class;
+                    else if (type == Short.TYPE)
+                        type = Short.class;
+                    else if (type == Integer.TYPE)
+                        type = Integer.class;
+                    else if (type == Long.TYPE)
+                        type = Long.class;
+                    else if (type == Float.TYPE)
+                        type = Float.class;
+                    else if (type == Double.TYPE)
+                        type = Double.class;
+                }
                 Constructor<?> init = type.getDeclaredConstructor(String.class);
                 v = init.newInstance(value);
             } catch (NoSuchMethodException e) {

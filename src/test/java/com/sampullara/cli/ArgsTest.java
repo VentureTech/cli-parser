@@ -103,6 +103,17 @@ public class ArgsTest extends TestCase {
         assertEquals("extra", extra.get(0));
     }
 
+    public void testPrimitiveCommand() {
+        TestCommand7 tc = new TestCommand7();
+        Args.parse(tc, new String[0]);
+        assertEquals(-1, tc.primitiveTest);
+        assertEquals(-2, tc.getPrimitiveProp());
+        String[] args = { "-primitiveTest", "123", "-primitiveProp", "456" };
+        Args.parse(tc, args);
+        assertEquals(123, tc.primitiveTest);
+        assertEquals(456, tc.getPrimitiveProp());
+    }
+    
     public void testDerivedCommand() {
         String[] args = { "-help", "-verbose" };
         TestCommand6 tc = new TestCommand6();
@@ -138,7 +149,6 @@ public class ArgsTest extends TestCase {
 
         @Argument(description = "not required")
         private boolean notRequired;
-
     }
 
     public static class StaticTestCommand {
@@ -284,5 +294,22 @@ public class ArgsTest extends TestCase {
     public static class TestCommand6 extends TestCommand5 {
         @Argument
         public boolean verbose;
+    }
+    
+    public static class TestCommand7 {
+        
+        @Argument(description = "primitive field test")
+        private int primitiveTest=-1;
+        private int primitiveProp=-2;
+
+        public int getPrimitiveProp() {
+            return primitiveProp;
+        }
+        @Argument(description = "primitive prop test")
+        public void setPrimitiveProp(int primitiveProp){
+            this.primitiveProp = primitiveProp;
+        }
+        
+        
     }
 }
