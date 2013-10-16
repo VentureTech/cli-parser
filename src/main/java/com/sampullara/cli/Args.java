@@ -135,16 +135,12 @@ public class Args {
 
     private static void addPropertyArgument(Class<?> type, PropertyDescriptor property, Object target, Object value, String delimiter) {
         try {
-            Method readMethod = property.getReadMethod();
-            makeAccessible(readMethod);
-            Object[] os = (Object[]) readMethod.invoke(target);
+            Object[] os = (Object[]) property.getReadMethod().invoke(target);
             Object[] vs = (Object[]) getValue(type, value, delimiter);
             Object[] s = (Object[]) Array.newInstance(type.getComponentType(), os.length + vs.length);
             System.arraycopy(os, 0, s, 0, os.length);
             System.arraycopy(vs, 0, s, os.length, vs.length);
-            Method writeMethod = property.getWriteMethod();
-            makeAccessible(writeMethod);
-            writeMethod.invoke(target, (Object) s);
+            property.getWriteMethod().invoke(target, (Object) s);
         } catch (IllegalAccessException iae) {
             throw new IllegalArgumentException("Could not set property " + property, iae);
         } catch (NoSuchMethodException e) {
@@ -264,7 +260,6 @@ public class Args {
                     if (readMethod == null) {
                         defaultValue = null;
                     } else {
-                        makeAccessible(readMethod);
                         defaultValue = readMethod.invoke(target, (Object[]) null);
                     }
                     Class<?> type = field.getPropertyType();
@@ -359,9 +354,7 @@ public class Args {
     static void setProperty(Class<?> type, PropertyDescriptor property, Object target, Object value, String delimiter) {
         try {
             value = getValue(type, value, delimiter);
-            Method writeMethod = property.getWriteMethod();
-            makeAccessible(writeMethod);
-            writeMethod.invoke(target, value);
+            property.getWriteMethod().invoke(target, value);
         } catch (IllegalAccessException iae) {
             throw new IllegalArgumentException("Could not set property " + property, iae);
         } catch (NoSuchMethodException e) {
@@ -428,7 +421,7 @@ public class Args {
                 return createdValue;
             }
         }
-        throw new IllegalArgumentException(String.format("cannot instanciate any %s object using %s value", type.toString(), valueAsString));
+        throw new IllegalArgumentException(String.format("cannot instantiate any %s object using %s value", type.toString(), valueAsString));
     }
 
     private static void makeAccessible(AccessibleObject ao) {
