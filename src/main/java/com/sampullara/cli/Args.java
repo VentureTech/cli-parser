@@ -209,7 +209,25 @@ public class Args {
         } else {
             clazz = target.getClass();
         }
-        errStream.println("Usage: " + clazz.getName());
+        usage(errStream, target, clazz.getName());
+    }
+    
+    
+    /**
+     * Generate usage information based on the target annotations.
+     *
+     * @param errStream A {@link java.io.PrintStream} to print the usage information to.
+     * @param target    An instance or class.
+     * @param mainClassName the main class name (may be different from target class).
+     */
+    public static void usage(PrintStream errStream, Object target, final String mainClassName) {
+        Class<?> clazz;
+        if (target instanceof Class) {
+            clazz = (Class<?>) target;
+        } else {
+            clazz = target.getClass();
+        }
+        errStream.println("Usage: " + mainClassName);
         for (Class<?> currentClazz = clazz; currentClazz != null; currentClazz = currentClazz.getSuperclass()) {
             for (Field field : currentClazz.getDeclaredFields()) {
                 fieldUsage(errStream, target, field);
